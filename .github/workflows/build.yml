@@ -1,0 +1,38 @@
+name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Unzip, build and make APK
+        run: |
+          mkdir src_unzipped
+          unzip -q "$(find . -maxdepth 1 -name '*.zip' | head -n 1)" -d src_unzipped
+          APPDIR=$(dirname "$(find src_unzipped -name package.json -not -path '*/node_modules/*' -not -path '*/__MACOSX/*' | head -n 1)")
+          cd "$APPDIR"
+          npm install
+          npm install @capacitor/core@7 @capacitor/android@7
+          npm install -D @capacitor/cli@7
+          npm run build
+          echo '{"appId":"com.radhemobile.the47","appName":"The 47 Ledger","webDir":"dist"}' > capacitor.config.json
+          npx cap add android
+          npx cap sync android
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/app-debug.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: the47-ledger-apk
+          path: app-debug.apk
