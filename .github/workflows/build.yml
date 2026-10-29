@@ -31,6 +31,7 @@ jobs:
           npx cap add android
           npx cap sync android
           cd android
+          sed -i 's|</style>|    <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>\n    <item name="android:statusBarColor">#000000</item>\n    <item name="android:navigationBarColor">#000000</item>\n    <item name="android:windowLightStatusBar">false</item>\n</style>|' app/src/main/res/values/styles.xml
           chmod +x gradlew
           ./gradlew assembleDebug
           cp app/build/outputs/apk/debug/app-debug.apk "$GITHUB_WORKSPACE/app-debug.apk"
