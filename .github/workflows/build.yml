@@ -30,6 +30,7 @@ jobs:
           echo '{"appId":"com.radhemobile.the47","appName":"The 47 Ledger","webDir":"dist"}' > capacitor.config.json
           npx cap add android
           npx cap sync android
+          if [ -d android-icons ]; then cp -r android-icons/. android/app/src/main/res/; fi
           cd android
           sed -i 's|</style>|    <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>\n    <item name="android:statusBarColor">#000000</item>\n    <item name="android:navigationBarColor">#000000</item>\n    <item name="android:windowLightStatusBar">false</item>\n</style>|' app/src/main/res/values/styles.xml
           chmod +x gradlew
